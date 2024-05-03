@@ -1,6 +1,6 @@
-import os
+import settings
 import string
-import json
+import typing
 
 from BaseClasses import Item, MultiWorld, Region, Location, Entrance, Tutorial, ItemClassification
 from .Items import item_table, faction_table
@@ -9,6 +9,17 @@ from .Regions import create_regions
 from .Rules import set_rules
 from ..AutoWorld import World, WebWorld
 from .Options import wargroove_options
+
+
+class WargrooveSettings(settings.Group):
+    class RootDirectory(settings.UserFolderPath):
+        """
+        Locate the Wargroove root directory on your system.
+        This is used by the Wargroove client, so it knows where to send communication files to
+        """
+        description = "Wargroove root directory"
+
+    root_directory: RootDirectory = RootDirectory("C:/Program Files (x86)/Steam/steamapps/common/Wargroove")
 
 
 class WargrooveWeb(WebWorld):
@@ -28,6 +39,7 @@ class WargrooveWorld(World):
     """
 
     option_definitions = wargroove_options
+    settings: typing.ClassVar[WargrooveSettings]
     game = "Wargroove"
     topology_present = True
     data_version = 1
@@ -52,7 +64,7 @@ class WargrooveWorld(World):
             starting_faction = WargrooveItem(self.multiworld.random.choice(factions) + ' Commanders', self.player)
             self.multiworld.push_precollected(starting_faction)
 
-    def generate_basic(self):
+    def create_items(self):
         # Fill out our pool with our items from the item table
         pool = []
         precollected_item_names = {item.name for item in self.multiworld.precollected_items[self.player]}
@@ -118,12 +130,6 @@ def create_region(world: MultiWorld, player: int, name: str, locations=None, exi
 
 class WargrooveLocation(Location):
     game: str = "Wargroove"
-
-    def __init__(self, player: int, name: str, address=None, parent=None):
-        super(WargrooveLocation, self).__init__(player, name, address, parent)
-        if address is None:
-            self.event = True
-            self.locked = True
 
 
 class WargrooveItem(Item):

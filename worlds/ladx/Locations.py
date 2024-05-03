@@ -60,13 +60,11 @@ class LinksAwakeningLocation(Location):
 
     def __init__(self, player: int, region, ladxr_item):
         name = meta_to_name(ladxr_item.metadata)
-
-        self.event = ladxr_item.event is not None
-        if self.event:
-            name = ladxr_item.event
-
         address = None
-        if not self.event:
+
+        if ladxr_item.event is not None:
+            name = ladxr_item.event
+        else:
             address = locations_to_id[name]
         super().__init__(player, name, address)
         self.parent_region = region
@@ -86,12 +84,6 @@ def has_free_weapon(state: CollectionState, player: int) -> bool:
 # If the player has access to farm enough rupees to afford a game, we assume that they can keep beating the game
 def can_farm_rupees(state: CollectionState, player: int) -> bool:
     return has_free_weapon(state, player) and (state.has("Can Play Trendy Game", player=player) or state.has("RAFT", player=player))
-
-
-def get_credits(state: CollectionState, player: int):
-    if can_farm_rupees(state, player):
-        return 999999999
-    return state.prog_items["RUPEES", player]
 
 
 class LinksAwakeningRegion(Region):
@@ -127,13 +119,16 @@ class GameStateAdapater:
         return self.state.has(item, self.player)
 
     def get(self, item, default):
+        # Don't allow any money usage if you can't get back wasted rupees
         if item == "RUPEES":
-            return get_credits(self.state, self.player)
+            if can_farm_rupees(self.state, self.player):
+                return self.state.prog_items[self.player]["RUPEES"]
+            return 0
         elif item.endswith("_USED"):
             return 0
         else:
             item = ladxr_item_to_la_item_name[item]
-        return self.state.prog_items.get((item, self.player), default)
+        return self.state.prog_items[self.player].get(item, default)
 
 
 class LinksAwakeningEntrance(Entrance):
@@ -222,7 +217,7 @@ def create_regions_from_ladxr(player, multiworld, logic):
 
         r = LinksAwakeningRegion(
             name=name, ladxr_region=l, hint="", player=player, world=multiworld)
-        r.locations = [LinksAwakeningLocation(player, r, i) for i in l.items]
+        r.locations += [LinksAwakeningLocation(player, r, i) for i in l.items]
         regions[l] = r
 
     for ladxr_location in logic.location_list:
