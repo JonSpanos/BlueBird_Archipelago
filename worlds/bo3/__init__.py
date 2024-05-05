@@ -1,9 +1,9 @@
-from .Items import TLNItem, item_table, event_table
-from .Locations import TLNAdvancement, tlnLocTable
-from .Regions import tln_regions, link_tln_areas
+from .Items import BO3Item, item_table, event_table
+from .Locations import BO3Advancement, bo3LocTable
+from .Regions import bo3_regions, link_bo3_areas
 from .Rules import set_rules
 from BaseClasses import Region, Entrance
-from .Options import tln_options
+from .Options import bo3_options
 from worlds.AutoWorld import World
 
 import logging
@@ -34,7 +34,6 @@ class BO3World(World):
         }
 
     def create_items(self):
-        self.multiworld.get_location("Stage 5: Flandre", self.player).place_locked_item(self.create_event("Defeat Flandre"))
         itempool = []
         for item_name, data in item_table.items():
             itempool += [self.create_item(item_name) for _ in range(0, data.quantity)]
