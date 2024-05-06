@@ -69,5 +69,4 @@ item_table = {
 }
 
 event_table = {
-    "Round 20": ItemData(None, ItemClassification.progression)
 }

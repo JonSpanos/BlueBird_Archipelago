@@ -8,8 +8,7 @@ def link_bo3_areas(world: MultiWorld, player: int):
 
 # (Region name, list of exits)
 bo3_regions = [
-    ("Menu", ["Zombies Menu"]),
-    ("Map Selection", ["SoE Select", "TG Select", "DE Select", "ZnS Select", "GK Select", "REV Select"]),
+    ("Menu", ["SoE Select","TG Select","DE Select","ZnS Select","GK Select","REV Select"]),
     ("Shadows of Evil", []),
     ("The Giant", []),
     ("Der Eisendrache", []),
@@ -20,7 +19,6 @@ bo3_regions = [
 
 # (Entrance, region pointed to)
 mandatory_connections = [
-    ("Zombies Menu", "Map Selection"),
     ("SoE Select", "Shadows of Evil"),
     ("TG Select", "The Giant"),
     ("DE Select", "Der Eisendrache"),
